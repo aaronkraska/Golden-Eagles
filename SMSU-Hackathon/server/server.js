@@ -5,7 +5,7 @@ dotenv.config({ path: new URL("./.env", import.meta.url), quiet: true });
 const store = createStore();
 const server = createApp(store).listen(
   Number(process.env.PORT) || 3001,
-  "127.0.0.1",
+  process.env.HOST || "0.0.0.0",
   () =>
     console.log(
       `AI Opportunity Finder API: http://127.0.0.1:${process.env.PORT || 3001}`,
