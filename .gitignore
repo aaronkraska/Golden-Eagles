@@ -13,3 +13,6 @@ server/data/
 test-results/
 playwright-report/
 *.log
+
+# Obsolete nested local checkout after repository flattening
+SMSU-Hackathon/
