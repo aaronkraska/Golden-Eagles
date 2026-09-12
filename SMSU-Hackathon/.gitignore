@@ -1,0 +1,15 @@
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Dependency and build output
+node_modules/
+dist/
+.npm-cache/
+
+# Project data and reports
+server/data/
+test-results/
+playwright-report/
+*.log

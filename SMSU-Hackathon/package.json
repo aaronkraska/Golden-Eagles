@@ -1,0 +1,25 @@
+{
+  "name": "ai-opportunity-finder",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm start -w server",
+    "test": "node --test server/test/*.test.js",
+    "test:browser": "playwright test",
+    "format": "prettier --write client/src server client/test playwright.config.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "concurrently": "^9.2.0",
+    "prettier": "^3.9.6"
+  }
+}
