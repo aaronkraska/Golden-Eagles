@@ -217,7 +217,7 @@ main {
   height: 435px;
   border-radius: 22px;
   background:
-    radial-gradient(ellipse at 75% 20%, #e5ebd6, transparent 55%), #eaf0e4;
+    radial-gradient(ellipse at 75% 20%, (var(--main-color-2)), transparent 55%), var(--main-color-1);
   position: relative;
   overflow: hidden;
   border: 1px solid var(--main-color-1);
@@ -689,7 +689,7 @@ progress::-webkit-progress-value {
   margin-bottom: 14px;
 }
 .alternative {
-  background: #f6ecd8;
+  background: var(--main-background);
   color: var(--main-color-3);
 }
 .opportunity h2 {
@@ -732,7 +732,7 @@ progress::-webkit-progress-value {
   font-size: 13px;
 }
 .detail-sections section + section {
-  border-top: 1px solid #e7ece1;
+  border-top: 1px solid var(--main-color-1);
   padding-top: 20px;
 }
 .detail-sections li {
@@ -788,8 +788,8 @@ progress::-webkit-progress-value {
   margin: 10px 20px;
 }
 .starters button {
-  border: 1px solid #dce5d4;
-  background: #fbfcf8;
+  border: 1px solid var(--main-color-1);
+  background: var(--main-background);
   border-radius: 15px;
   font-size: 10px;
   padding: 6px 9px;
@@ -809,24 +809,24 @@ progress::-webkit-progress-value {
 }
 .workflow span {
   margin-right: 12px;
-  color: #8da078;
+  color: var(--main-color-3);
 }
 .change {
   padding: 15px 0;
-  border-bottom: 1px solid #e2e8dc;
+  border-bottom: 1px solid var(--main-color-1);
   font-size: 13px;
 }
 .change p {
   margin: 6px 0;
 }
 footer {
-  border-top: 1px solid #e0e5d9;
+  border-top: 1px solid var(--main-color-1);
   padding: 24px 5%;
   display: flex;
   justify-content: space-between;
   gap: 20px;
   font-size: 10px;
-  color: #89917f;
+  color: var(--main-color-3);
 }
 footer span:first-child {
   display: flex;
