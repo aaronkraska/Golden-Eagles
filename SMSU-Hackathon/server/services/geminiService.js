@@ -14,9 +14,25 @@ export class AppError extends Error {
   }
 }
 export const responseSchema = (schema) => {
-  const { $schema, ...jsonSchema } = zodToJsonSchema(schema, { $refStrategy: "none" });
+  const { $schema, ...jsonSchema } = zodToJsonSchema(schema, {
+    $refStrategy: "none",
+  });
   return jsonSchema;
 };
+export async function generateWithRetry(
+  client,
+  params,
+  wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await client.models.generateContent(params);
+    } catch (error) {
+      if (![500, 503].includes(error.status) || attempt >= 2) throw error;
+      await wait(1000 * 2 ** attempt);
+    }
+  }
+}
 async function request(schema, name, instructions, state, analysis = false) {
   if (
     !process.env.GEMINI_API_KEY ||
@@ -31,7 +47,7 @@ async function request(schema, name, instructions, state, analysis = false) {
     httpOptions: { timeout: 90000 },
   });
   try {
-    const response = await client.models.generateContent({
+    const response = await generateWithRetry(client, {
       model:
         (analysis && process.env.GEMINI_ANALYSIS_MODEL) ||
         process.env.GEMINI_MODEL ||
@@ -62,12 +78,21 @@ async function request(schema, name, instructions, state, analysis = false) {
         429,
         "Gemini rate limit or quota reached. Check API billing or wait before retrying.",
       );
+    if (error.status === 500 || error.status === 503)
+      throw new AppError(
+        503,
+        "Gemini is temporarily unavailable or experiencing high demand. Automatic retries failed. Please try again in a minute; your saved analysis is unchanged.",
+      );
     if (error.status === 400 || error.status === 404)
       throw new AppError(
         502,
         "Gemini rejected the request. Check GEMINI_API_KEY, model access, and GEMINI_MODEL in server/.env.",
       );
-    if (error.name === "AbortError" || error.name === "TimeoutError" || error.status === 504)
+    if (
+      error.name === "AbortError" ||
+      error.name === "TimeoutError" ||
+      error.status === 504
+    )
       throw new AppError(
         504,
         "Gemini timed out. Your analysis is saved; please retry.",
