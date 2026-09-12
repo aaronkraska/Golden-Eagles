@@ -58,6 +58,22 @@ npm start
 
 Open **http://127.0.0.1:3001**; Express serves the compiled frontend. If changing the API port during development, also update the target in `client/vite.config.js`.
 
+## Deploy to Vercel
+
+This repository includes a Vercel function entrypoint at `api/index.js`. In Vercel, create a project from this repository with the project root set to `SMSU-Hackathon`. The included `vercel.json` sets the build command and routes `/api/*` requests to the Express function.
+
+Add these environment variables in the Vercel project settings for Production, Preview, and Development as needed:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=your_model
+GEMINI_ANALYSIS_MODEL=your_analysis_model
+```
+
+`GEMINI_API_KEY` is server-only. Do not prefix it with `VITE_`, put it in client code, or commit it. Vercel exposes environment variables to the function, not to the browser, unless the variable is explicitly bundled into the client build.
+
+The Vercel function currently uses `/tmp/analyses.sqlite`, which is writable but ephemeral. Sessions can disappear when Vercel starts a new function instance, and concurrent instances do not share the same database. Use a hosted database and replace `createStore` with a network-backed store before using this for persistent user data. The local SQLite store remains suitable for local development and tests.
+
 ## Architecture and request flow
 
 ```text

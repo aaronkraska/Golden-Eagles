@@ -5,6 +5,9 @@ import { randomUUID } from "node:crypto";
 import { emptyProfile } from "./utils/validation.js";
 export function createStore(filename) {
   if (!filename) {
+    if (process.env.VERCEL) filename = "/tmp/analyses.sqlite";
+  }
+  if (!filename) {
     mkdirSync(new URL("./data/", import.meta.url), { recursive: true });
     filename = fileURLToPath(
       new URL("./data/analyses.sqlite", import.meta.url),

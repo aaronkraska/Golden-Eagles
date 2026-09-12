@@ -44,7 +44,7 @@ async function request(schema, name, instructions, state, analysis = false) {
     );
   const client = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
-    httpOptions: { timeout: 90000 },
+    httpOptions: { timeout: process.env.VERCEL ? 55000 : 90000 },
   });
   try {
     const response = await generateWithRetry(client, {
