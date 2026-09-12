@@ -25,7 +25,7 @@ export default function ChatPanel({
           <Sparkles size={19} />
         </div>
         <div>
-          <strong>Your AI consultant</strong>
+          <strong>Busi: Your AI consultant</strong>
           <div className="muted small">
             A conversation built around your business
           </div>
@@ -35,7 +35,7 @@ export default function ChatPanel({
       <div className="messages" aria-live="polite">
         {!messages.length && (
           <div className="message assistant">
-            <span className="message-label">AI CONSULTANT</span>
+            <span className="message-label">AskBusi</span>
             <p>{initial}</p>
           </div>
         )}
