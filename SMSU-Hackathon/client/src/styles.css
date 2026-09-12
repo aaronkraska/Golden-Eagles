@@ -2,10 +2,15 @@
 :root {
   font-family: "DM Sans", sans-serif;
   color: #203b35;
-  background: #f7f8f4;
+  background: var(--main-background);
   font-synthesis: none;
   font-weight: 400;
   line-height: 1.55;
+  --main-background:#f8f6f4;
+  --main-color-1:#ffd7b5;
+  --main-color-2:#ffb38a;
+  --main-color-3:#ff9248;
+  --main-color-4:#ff6700;
 }
 * {
   box-sizing: border-box;
@@ -29,7 +34,7 @@ button:disabled {
 }
 button:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid #83b6a0;
+  outline: 3px solid var(--main-color-3);
   outline-offset: 3px;
 }
 button {
@@ -68,12 +73,12 @@ p {
 }
 header {
   height: 94px;
-  border-bottom: 1px solid #e3e7df;
+  border-bottom: 1px solid var(--main-color-1);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 5.2%;
-  background: #fafbf8;
+  background: var(--main-color-1);
 }
 nav {
   display: flex;
@@ -86,11 +91,11 @@ nav {
   font-weight: 800;
   font-size: 23px;
   letter-spacing: -1px;
-  color: #1d3e35;
+  color: var(--main-color-4);
 }
 .brand-icon {
-  background: #204c40;
-  color: #d9edbc;
+  background: var(--main-color-4);
+  color: var(--main-color-1);
   padding: 8px;
   border-radius: 12px;
   display: flex;
@@ -98,13 +103,13 @@ nav {
 .brand-ai {
   font-size: 15px;
   font-weight: 500;
-  color: #7a877d;
+  color: var(--main-color-3);
   letter-spacing: 0;
 }
 .nav-caption {
   font-size: 9px;
   letter-spacing: 1.5px;
-  color: #6d7e74;
+  color: var(--main-color-3);
 }
 main {
   max-width: 1370px;
@@ -122,23 +127,23 @@ main {
   font-size: 13px;
 }
 .primary {
-  background: #235543;
+  background: var(--main-color-4);
   color: white;
 }
 .primary:hover:not(:disabled) {
-  background: #173e30;
+  background: var(--main-color-4);
 }
 .secondary {
   background: transparent;
-  border: 1px solid #d3dcd2;
-  color: #294b3e;
+  border: 1px solid var(--main-color-1);
+  color: var(--main-color-4);
 }
 .secondary:hover:not(:disabled) {
-  background: #edf1e8;
+  background: var(--main-color-1);
 }
 .text-button {
   background: transparent;
-  color: #356249;
+  color: var(--main-color-3);
   padding: 8px 0;
 }
 .big {
@@ -149,7 +154,7 @@ main {
   width: 100%;
 }
 .muted {
-  color: #738078;
+  color: var(--main-color-3);
 }
 .small {
   font-size: 12px;
@@ -158,7 +163,7 @@ main {
   font-size: 10px;
   letter-spacing: 1.9px;
   font-weight: 700;
-  color: #587463;
+  color: var(--main-color-3);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -170,7 +175,7 @@ main {
   width: 7px;
   display: inline-block;
   border-radius: 50%;
-  background: #76a27c;
+  background: var(--main-color-3);
 }
 .hero {
   display: grid;
@@ -187,7 +192,7 @@ main {
 }
 .hero h1 em {
   font-style: normal;
-  color: #73956b;
+  color: var(--main-color-3);
 }
 .hero-copy > p {
   font-size: 18px;
@@ -196,7 +201,7 @@ main {
 .hero-copy > .hero-description {
   font-size: 14px;
   line-height: 1.9;
-  color: #758075;
+  color: var(--main-color-3);
   margin-bottom: 28px;
   max-width: 455px;
 }
@@ -205,7 +210,7 @@ main {
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: #788277;
+  color: var(--main-color-3);
   margin-top: 18px;
 }
 .hero-art {
@@ -215,7 +220,7 @@ main {
     radial-gradient(ellipse at 75% 20%, #e5ebd6, transparent 55%), #eaf0e4;
   position: relative;
   overflow: hidden;
-  border: 1px solid #e1e6d8;
+  border: 1px solid var(--main-color-1);
 }
 .art-label {
   position: absolute;
@@ -223,11 +228,11 @@ main {
   left: 30px;
   font-size: 9px;
   letter-spacing: 2px;
-  color: #779174;
+  color: var(--main-color-3);
 }
 .orbit {
   position: absolute;
-  border: 1px solid #cddcc8;
+  border: 1px solid var(--main-color-1);
   border-radius: 50%;
   width: 380px;
   height: 380px;
@@ -247,8 +252,8 @@ main {
   width: 182px;
   height: 182px;
   border-radius: 32px;
-  background: linear-gradient(140deg, #365d46, #204636);
-  color: #e0edc4;
+  background: linear-gradient(140deg, var(--main-color-3), var(--main-color-4));
+  color: var(--main-color-1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,7 +263,7 @@ main {
   font-family: Manrope;
   font-size: 20px;
   line-height: 1.25;
-  box-shadow: 0 20px 40px #244a3320;
+  box-shadow: 0 20px 40px #4a352420;
   transform: rotate(-5deg);
 }
 .art-node {
@@ -266,13 +271,12 @@ main {
   display: flex;
   gap: 12px;
   align-items: center;
-  background: #fafcf5;
-  border: 1px solid #fff;
+  border: 1px solid var(--main-color-1);
   padding: 16px 20px;
   border-radius: 12px;
   font-size: 12px;
-  box-shadow: 0 12px 24px #3b5c3910;
-  color: #506b4e;
+  box-shadow: 0 12px 24px #5c493910;
+  color: var(--main-color-3);
   z-index: 2;
 }
 .node-one {
@@ -292,10 +296,10 @@ main {
   text-align: center;
   font-size: 9px;
   letter-spacing: 2px;
-  color: #7b9077;
+  color: var(--main-color-3);
 }
 .process {
-  border-top: 1px solid #dfe5d9;
+  border-top: 1px solid var(--main-color-1);
   padding-top: 35px;
 }
 .section-intro h2 {
@@ -316,21 +320,21 @@ main {
 .step-number {
   font-family: Manrope;
   font-size: 12px;
-  border: 1px solid #d7e0d0;
-  color: #678159;
+  border: 1px solid var(--main-color-1);
+  color: var(--main-color-3);
   border-radius: 50%;
   padding: 7px 9px;
   display: inline-block;
   margin-bottom: 18px;
 }
 .process-cards p {
-  color: #7c857a;
+  color: var(--main-color-3);
   font-size: 13px;
   line-height: 1.8;
 }
 .panel {
   background: #fff;
-  border: 1px solid #e1e6de;
+  border: 1px solid var(--main-color-1);
   border-radius: 14px;
   padding: 25px;
 }
@@ -349,29 +353,29 @@ main {
   display: flex;
   align-items: center;
   gap: 16px;
-  border-bottom: 1px solid #e2e6dd;
+  border-bottom: 1px solid var(--main-color-1);
   padding: 24px 0;
 }
 .stagebar button {
   background: none;
   border: 0;
-  color: #9aa397;
+  color: var(--main-color-3);
   font-size: 12px;
   padding: 4px 0;
   gap: 10px;
 }
 .stagebar button.active {
-  color: #315b42;
+  color: var(--main-color-2);
   font-weight: 700;
 }
 .stage-line {
   width: 46px;
   height: 1px;
-  background: #d3dcd0;
+  background: var(--main-color-1);
 }
 .saved {
   margin-left: auto;
-  color: #87907f;
+  color: var(--main-color-3);
   font-size: 11px;
 }
 .interview-grid {
@@ -389,15 +393,15 @@ main {
   align-items: center;
   gap: 12px;
   padding: 20px 23px;
-  border-bottom: 1px solid #e8ece6;
+  border-bottom: 1px solid var(--main-color-1);
 }
 .chat-heading strong {
   font-size: 14px;
 }
 .avatar {
   display: flex;
-  background: #eef2e6;
-  color: #648154;
+  background: var(--main-background);
+  color: var(--main-color-3);
   padding: 10px;
   border-radius: 10px;
 }
@@ -415,7 +419,7 @@ main {
   margin-bottom: 20px;
   border-radius: 12px;
   padding: 17px 20px;
-  background: #f3f5ef;
+  background: var(--main-background);
   font-size: 14px;
 }
 .message p {
@@ -425,18 +429,18 @@ main {
 }
 .message.user {
   margin-left: auto;
-  background: #e9f1e8;
+  background: var(--main-color-1);
 }
 .message-label {
   font-size: 9px;
   letter-spacing: 1.4px;
-  color: #6e8366;
+  color: var(--main-color-3);
   font-weight: 700;
 }
 .composer {
   margin: 0 20px;
   position: relative;
-  border: 1px solid #dce3d7;
+  border: 1px solid var(--main-color-1);
   border-radius: 10px;
   background: #fff;
 }
@@ -451,13 +455,13 @@ main {
   border-radius: 10px;
   font-size: 13px;
   background: transparent;
-  color: #284734;
+  color: var(--main-color-4);
 }
 .send {
   position: absolute;
   bottom: 12px;
   right: 12px;
-  background: #28573f;
+  background: var(--main-color-4);
   color: white;
   border: 0;
   border-radius: 7px;
@@ -465,14 +469,14 @@ main {
 }
 .composer-hint {
   font-size: 10px;
-  color: #909889;
+  color: var(--main-color-2);
   margin: 10px 23px 15px;
 }
 .thinking {
   display: flex;
   gap: 8px;
   align-items: center;
-  color: #688061;
+  color: var(--main-color-3);
   font-size: 12px;
 }
 .profile h2 {
@@ -490,16 +494,16 @@ main {
 progress {
   width: 100%;
   height: 7px;
-  accent-color: #6c9459;
+  accent-color: var(--main-color-2);
   border: 0;
   border-radius: 8px;
   overflow: hidden;
 }
 progress::-webkit-progress-bar {
-  background: #edf0e7;
+  background: var(--main-background);
 }
 progress::-webkit-progress-value {
-  background: #739460;
+  background: var(--main-color-2);
 }
 .profile-fields {
   margin-top: 19px;
@@ -507,7 +511,7 @@ progress::-webkit-progress-value {
   overflow: auto;
 }
 .profile-field {
-  border-top: 1px solid #edf0e9;
+  border-top: 1px solid var(--main-color-1);
   padding: 12px 0;
 }
 .profile-field > div {
@@ -516,7 +520,7 @@ progress::-webkit-progress-value {
   gap: 8px;
   font-size: 11px;
   font-weight: 600;
-  color: #6e8064;
+  color: var(--main-color-3);
 }
 .profile-field p {
   font-size: 12px;
@@ -524,7 +528,7 @@ progress::-webkit-progress-value {
   overflow-wrap: anywhere;
 }
 .note {
-  background: #f0f4e9;
+  background: var(--main-background);
   padding: 16px;
   border-radius: 9px;
   margin-top: 18px;
@@ -535,9 +539,9 @@ progress::-webkit-progress-value {
 }
 .ready {
   margin-top: 18px;
-  border: 1px solid #d1dfc5;
+  border: 1px solid var(--main-color-1);
   border-radius: 12px;
-  background: #ecf2e3;
+  background: var(--main-color-1);
   padding: 22px;
   display: flex;
   gap: 20px;
@@ -572,8 +576,8 @@ progress::-webkit-progress-value {
   font-size: 20px;
 }
 .setup {
-  background: #fbf1d9;
-  color: #76602d;
+  background: var(--main-background);
+  color: var(--main-color-4);
 }
 .setup .text-button {
   margin-left: 15px;
@@ -583,7 +587,7 @@ progress::-webkit-progress-value {
   bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
-  background: #234836;
+  background: var(--main-color-4);
   color: white;
   border-radius: 12px;
   box-shadow: 0 8px 30px #0002;
@@ -628,16 +632,16 @@ progress::-webkit-progress-value {
   margin: 5px 0;
 }
 .score-explainer {
-  background: #eef2e7;
+  background: var(--main-background);
 }
 .score-explainer > p {
   font-size: 13px;
-  color: #728067;
+  color: var(--main-color-3);
 }
 .weight {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #dce4d4;
+  border-bottom: 1px solid var(--main-color-1);
   padding: 12px 0;
   font-size: 12px;
 }
@@ -661,7 +665,7 @@ progress::-webkit-progress-value {
   align-items: center;
 }
 .score {
-  color: #427043;
+  color: var(--main-color-2);
   font-family: Manrope;
   font-size: 32px;
   font-weight: 800;
@@ -669,16 +673,16 @@ progress::-webkit-progress-value {
 .score small {
   font-size: 10px;
   margin-left: 3px;
-  color: #8c9783;
+  color: var(--main-color-3);
   font-weight: 500;
 }
 .tag {
   display: inline-block;
   align-self: flex-start;
-  background: #eef2e7;
+  background: var(--main-background);
   border-radius: 5px;
   padding: 4px 8px;
-  color: #62774f;
+  color: var(--main-color-3);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -686,7 +690,7 @@ progress::-webkit-progress-value {
 }
 .alternative {
   background: #f6ecd8;
-  color: #826631;
+  color: var(--main-color-3);
 }
 .opportunity h2 {
   font-size: 21px;
@@ -707,8 +711,8 @@ progress::-webkit-progress-value {
   display: flex;
   gap: 20px;
   padding: 12px 0;
-  border-top: 1px solid #edf0e8;
-  border-bottom: 1px solid #edf0e8;
+  border-top: 1px solid var(--main-color-1);
+  border-bottom: 1px solid var(--main-color-1);
   font-size: 11px;
 }
 .mini-ratings b {
@@ -743,7 +747,7 @@ progress::-webkit-progress-value {
 .ratings span {
   display: block;
   font-size: 10px;
-  color: #76876c;
+  color: var(--main-color-3);
 }
 .ratings strong {
   font-size: 23px;
@@ -751,7 +755,7 @@ progress::-webkit-progress-value {
 .ratings small {
   font-weight: 400;
   font-size: 10px;
-  color: #8d9885;
+  color: var(--main-color-4);
 }
 .large {
   font-size: 53px;
@@ -789,7 +793,7 @@ progress::-webkit-progress-value {
   border-radius: 15px;
   font-size: 10px;
   padding: 6px 9px;
-  color: #658052;
+  color: var(--main-color-3);
 }
 .workflow {
   display: flex;
@@ -797,8 +801,8 @@ progress::-webkit-progress-value {
   gap: 10px;
 }
 .workflow > div {
-  background: #f1f5eb;
-  border: 1px solid #dbe6d1;
+  background: var(--main-background);
+  border: 1px solid var(--main-color-1);
   border-radius: 7px;
   padding: 12px;
   font-size: 12px;
@@ -927,7 +931,7 @@ footer svg {
     gap: 15px;
   }
   .process-cards article {
-    border-bottom: 1px solid #e0e6d9;
+    border-bottom: 1px solid var(--main-color-1);
   }
   .step-number {
     float: left;
