@@ -119,7 +119,7 @@ export default function App() {
           <span className="brand-icon">
             <Compass size={23} />
           </span>
-          opportunity<span className="brand-ai">/ AI</span>
+          AskBusi: <span className="brand-ai">/ AI</span>
         </button>
         <nav>
           <span className="nav-caption">
@@ -467,7 +467,7 @@ export default function App() {
           Do not enter passwords, API keys, Social Security numbers, or other
           secrets into the assessment.
         </span>
-        <span>AI Opportunity Finder</span>
+        <span>AskBusi: AI Opportunity Finder</span>
       </footer>
     </div>
   );
