@@ -1,4 +1,4 @@
-# AI Opportunity Finder
+# AskBusi - AI Opportunity Finder
 
 A functional, general-purpose AI discovery application. Users describe any business workflow; a live AI consultant extracts context, chooses its next question, and decides when the evidence supports recommendations. There are no seeded businesses, canned model answers, or industry-based recommendation branches.
 
