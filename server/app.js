@@ -8,9 +8,12 @@ import { RequestBody } from "./utils/validation.js";
 import { rank } from "./utils/scoring.js";
 import * as liveAI from "./services/geminiService.js";
 const { AppError } = liveAI;
+// Inject storage and AI implementations so tests can exercise real HTTP routes with fixtures.
+// The busy set belongs to this app instance; it does not coordinate multiple server processes.
 export function createApp(store, ai = liveAI) {
   const app = express(),
     busy = new Set();
+  // Apply security headers, body limits, and API rate limiting before route handlers.
   app.use(helmet());
   app.use(express.json({ limit: "32kb" }));
   app.use(
@@ -23,6 +26,7 @@ export function createApp(store, ai = liveAI) {
       message: { error: "Too many requests. Please wait a minute." },
     }),
   );
+  // Report whether a key is present without sending it to the client or calling Gemini.
   app.get("/api/health", (_req, res) =>
     res.json({
       ok: true,
@@ -39,11 +43,14 @@ export function createApp(store, ai = liveAI) {
       throw new AppError(404, "Analysis not found. Start a new analysis.");
     res.json(s);
   });
+  // All analysis mutations share validation, duplicate detection, locking, and persistence.
+  // Store reads return detached objects, so failed operations leave the saved session intact.
   const mutate = (operation) => async (req, res) => {
     const body = RequestBody.parse(req.body),
       s = store.get(body.sessionId);
     if (!s)
       throw new AppError(404, "Analysis not found. Start a new analysis.");
+    // A completed request UUID returns the latest session without repeating the AI call.
     if (s.completedRequests.includes(body.requestId)) return res.json(s);
     if (busy.has(s.id))
       throw new AppError(
@@ -55,12 +62,14 @@ export function createApp(store, ai = liveAI) {
         409,
         "This analysis has reached its conversation limit. Export it and start a new analysis.",
       );
+    // Acquire the lock before awaiting AI; only successful operations advance the revision.
     busy.add(s.id);
     try {
       await operation(s, body, req);
       s.revision++;
       s.completedRequests.push(body.requestId);
       res.json(store.save(s));
+    // Release the lock on both success and failure so the session remains usable.
     } finally {
       busy.delete(s.id);
     }
@@ -74,6 +83,7 @@ export function createApp(store, ai = liveAI) {
         history: s.history,
         message: b.message,
       });
+      // Save both sides of the turn together; scope separates interview and detail chats.
       s.history.push(
         { role: "user", content: b.message, scope: "interview" },
         { role: "assistant", content: result.message, scope: "interview" },
@@ -84,6 +94,7 @@ export function createApp(store, ai = liveAI) {
         understandingScore: result.understandingScore,
         interviewComplete: result.interviewComplete,
       });
+      // New interview context can invalidate recommendations that were generated earlier.
       if (s.useCases.length) s.stale = true;
     }),
   );
@@ -100,6 +111,8 @@ export function createApp(store, ai = liveAI) {
         history: s.history,
         previousRecommendations: s.useCases,
       });
+      // Full generation replaces the map with new IDs and fresh change histories.
+      // Ratings come from AI; final scores and ordering are computed locally.
       s.useCases = rank(
         result.useCases.map((item) => ({
           ...item,
@@ -111,6 +124,7 @@ export function createApp(store, ai = liveAI) {
       s.stale = false;
     }),
   );
+  // Discussion and explicit reanalysis share update logic but select different AI operations.
   const discuss = (reanalyze) =>
     mutate(async (s, b, req) => {
       const selected = s.useCases.find((x) => x.id === req.params.id);
@@ -135,10 +149,12 @@ export function createApp(store, ai = liveAI) {
         { role: "user", content: b.message, scope: selected.id },
         { role: "assistant", content: result.message, scope: selected.id },
       );
+      // A null replacement means the reply was explanatory and preserves existing ratings.
       if (result.updatedRecommendation) {
         const replacement = rank([
           { ...result.updatedRecommendation, id: selected.id },
         ])[0];
+        // Keep the recommendation ID stable and append a compact before/after audit trail.
         replacement.changes = [
           ...selected.changes,
           {
@@ -160,6 +176,7 @@ export function createApp(store, ai = liveAI) {
           s.useCases.map((x) => (x.id === selected.id ? replacement : x)),
         );
       }
+      // Updating one item cannot clear an earlier warning that the entire map needs refresh.
       s.stale = s.stale || result.otherRecommendationsAffected;
     });
   app.post("/api/recommendations/:id/chat", discuss(false));
@@ -167,9 +184,12 @@ export function createApp(store, ai = liveAI) {
   app.use("/api", (_req, res) =>
     res.status(404).json({ error: "API route not found." }),
   );
+  // Local production runs serve the Vite build from the same origin as the API.
   app.use(
     express.static(fileURLToPath(new URL("../client/dist/", import.meta.url))),
   );
+  // Convert validation, parsing, and service failures to the JSON error shape used by React.
+  // Only intentional AppError messages are exposed; unexpected errors get a generic message.
   app.use((error, _req, res, _next) => {
     const status =
       error instanceof z.ZodError

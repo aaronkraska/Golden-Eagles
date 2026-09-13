@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Sparkles, LoaderCircle } from "lucide-react";
+// Reusable interview/detail composer; the parent supplies already-filtered conversation history.
 export default function ChatPanel({
   messages,
   onSend,
@@ -9,15 +10,19 @@ export default function ChatPanel({
 }) {
   const [draft, setDraft] = useState("");
   const bottom = useRef(null);
+  // Keep the newest message or thinking indicator visible when the conversation grows.
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [messages.length, busy]);
+  // Only clear a draft after the parent confirms success, allowing failed messages to be retried.
   async function submit(e) {
     e.preventDefault();
     if (!draft.trim() || busy) return;
     const ok = await onSend(draft.trim());
     if (ok) setDraft("");
   }
+  // An empty history shows a local greeting; starter buttons fill the draft without sending.
+  // Enter submits via the same handler as the form, while Shift+Enter keeps a newline.
   return (
     <section className="panel chat">
       <div className="chat-heading">

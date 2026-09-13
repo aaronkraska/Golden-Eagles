@@ -9,6 +9,8 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts";
+// Plot complexity on X and impact on Y, with risk controlling bubble size on fixed 0-10 scales.
+// Midpoint reference lines divide the matrix; selecting a bubble opens its recommendation ID.
 export default function ImpactEffortChart({ items, onSelect }) {
   return (
     <section className="panel matrix">

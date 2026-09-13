@@ -1,6 +1,8 @@
 import { Check, CircleHelp } from "lucide-react";
+// Turn camelCase schema keys into display labels, also reused by recommendation details.
 export const label = (key) =>
   key.replace(/([A-Z])/g, " $1").replace(/^./, (x) => x.toUpperCase());
+// Render the server profile generically; readiness and missing facts come from the AI response.
 export default function BusinessProfile({ session }) {
   return (
     <aside className="panel profile">
@@ -14,6 +16,7 @@ export default function BusinessProfile({ session }) {
       <progress max="100" value={session.understandingScore} />
       <div className="profile-fields">
         {Object.entries(session.profile).map(([key, value]) => {
+          // Empty arrays and absent scalar values both mean this fact has not been learned yet.
           const known = Array.isArray(value) ? value.length > 0 : !!value;
           return (
             <div className="profile-field" key={key}>

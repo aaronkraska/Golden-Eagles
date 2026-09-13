@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+/* Shared typography and color variables feed the component styles below. */
 :root {
   font-family: "DM Sans", sans-serif;
   color: #203b35;
@@ -12,6 +13,7 @@
   --main-color-3:#ff9248;
   --main-color-4:#ff6700;
 }
+/* Global sizing, form inheritance, and keyboard focus treatment. */
 * {
   box-sizing: border-box;
 }
@@ -71,6 +73,7 @@ h3 {
 p {
   margin-bottom: 16px;
 }
+/* Application shell, navigation, and shared button/text utilities. */
 header {
   height: 94px;
   border-bottom: 1px solid var(--main-color-1);
@@ -177,6 +180,7 @@ main {
   border-radius: 50%;
   background: var(--main-color-3);
 }
+/* Landing layout and decorative artwork positioned inside its own clipped container. */
 .hero {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
@@ -298,6 +302,7 @@ main {
   letter-spacing: 2px;
   color: var(--main-color-3);
 }
+/* Three-step introduction displayed below the landing hero. */
 .process {
   border-top: 1px solid var(--main-color-1);
   padding-top: 35px;
@@ -332,6 +337,7 @@ main {
   font-size: 13px;
   line-height: 1.8;
 }
+/* Reusable surfaces and analysis-stage navigation. */
 .panel {
   background: #fff;
   border: 1px solid var(--main-color-1);
@@ -378,6 +384,7 @@ main {
   color: var(--main-color-3);
   font-size: 11px;
 }
+/* Desktop interview columns keep the chat beside the evolving business profile. */
 .interview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
@@ -408,6 +415,7 @@ main {
 .live-dot {
   margin-left: auto;
 }
+/* Scroll the message pane independently; preserve user line breaks and wrap long content. */
 .messages {
   height: 380px;
   overflow: auto;
@@ -437,6 +445,7 @@ main {
   color: var(--main-color-3);
   font-weight: 700;
 }
+/* The send button sits inside the textarea's reserved right padding. */
 .composer {
   margin: 0 20px;
   position: relative;
@@ -479,6 +488,7 @@ main {
   color: var(--main-color-3);
   font-size: 12px;
 }
+/* Readiness and profile facts have their own bounded scrolling area. */
 .profile h2 {
   font-size: 20px;
 }
@@ -555,6 +565,7 @@ progress::-webkit-progress-value {
   font-size: 12px;
   margin: 8px 0 0;
 }
+/* Inline feedback and a fixed request-status indicator share the app's busy/error state. */
 .error,
 .setup {
   padding: 16px 20px;
@@ -608,6 +619,7 @@ progress::-webkit-progress-value {
     transform: rotate(360deg);
   }
 }
+/* Results pair a fixed-height responsive chart with the scoring explanation. */
 .results-top {
   display: grid;
   grid-template-columns: 1.7fr 1fr;
@@ -649,6 +661,7 @@ progress::-webkit-progress-value {
   margin-top: 20px;
   font-size: 11px;
 }
+/* Flex card interiors keep action buttons aligned beneath variable-length content. */
 .opportunities {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -718,6 +731,7 @@ progress::-webkit-progress-value {
 .mini-ratings b {
   margin-left: 5px;
 }
+/* Recommendation evidence and a sticky discussion pane form the desktop detail view. */
 .detail-grid {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
@@ -836,6 +850,7 @@ footer span:first-child {
 footer svg {
   flex-shrink: 0;
 }
+/* Wide screens add breathing room; narrower breakpoints progressively collapse columns. */
 @media (min-width: 1500px) {
   .hero {
     padding-top: 100px;
@@ -875,6 +890,7 @@ footer svg {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* Mobile layouts stack panels and release the sticky discussion pane into normal flow. */
 @media (max-width: 760px) {
   header {
     height: 77px;
@@ -1007,6 +1023,7 @@ footer svg {
     gap: 15px;
   }
 }
+/* Honor reduced motion for CSS scrolling, transitions, and the loading spinner. */
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;

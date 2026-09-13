@@ -1,4 +1,6 @@
 import { defineConfig } from "@playwright/test";
+// Browser checks run in headless Edge against a fresh Express server serving client/dist.
+// Build the client first; the health endpoint tells Playwright when the server is ready.
 export default defineConfig({
   testDir: "./client/test",
   fullyParallel: false,

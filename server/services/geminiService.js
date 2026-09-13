@@ -7,18 +7,22 @@ import {
 } from "../utils/validation.js";
 import { interviewer } from "../prompts/interviewer.js";
 import { analyst, discussion } from "../prompts/recommendationAnalyst.js";
+// Carry an HTTP status and a client-facing message through the service and Express layers.
 export class AppError extends Error {
   constructor(status, message) {
     super(message);
     this.status = status;
   }
 }
+// Inline schema references and omit the JSON Schema dialect marker for the model request.
 export const responseSchema = (schema) => {
   const { $schema, ...jsonSchema } = zodToJsonSchema(schema, {
     $refStrategy: "none",
   });
   return jsonSchema;
 };
+// Retry only temporary server failures, at most three total attempts with 1s/2s waits.
+// An injectable wait function lets tests inspect backoff without actually sleeping.
 export async function generateWithRetry(
   client,
   params,
@@ -33,6 +37,7 @@ export async function generateWithRetry(
     }
   }
 }
+// One gateway handles all prompt/schema pairs; the name argument is currently unused.
 async function request(schema, name, instructions, state, analysis = false) {
   if (
     !process.env.GEMINI_API_KEY ||
@@ -52,6 +57,7 @@ async function request(schema, name, instructions, state, analysis = false) {
         (analysis && process.env.GEMINI_ANALYSIS_MODEL) ||
         process.env.GEMINI_MODEL ||
         "gemini-3.8-flash",
+      // Serialize business state as content while keeping role instructions in systemInstruction.
       contents: JSON.stringify(state),
       config: {
         systemInstruction: instructions,
@@ -60,12 +66,14 @@ async function request(schema, name, instructions, state, analysis = false) {
         maxOutputTokens: 14000,
       },
     });
+    // Reject incomplete output before parsing, then validate every field with the local schema.
     if (response.candidates?.[0]?.finishReason !== "STOP" || !response.text)
       throw new AppError(
         502,
         "The model returned an incomplete response or declined the request. Rephrase or retry; your saved analysis is unchanged.",
       );
     return schema.parse(JSON.parse(response.text));
+  // Translate SDK, network, and parsing errors into stable messages for the UI.
   } catch (error) {
     if (error instanceof AppError) throw error;
     if (error.status === 401 || error.status === 403)
@@ -108,6 +116,7 @@ async function request(schema, name, instructions, state, analysis = false) {
     );
   }
 }
+// Select each operation's contract; analysis operations can use a separate configured model.
 export const runBusinessInterview = (state) =>
   request(InterviewResponse, "business_interview", interviewer, state);
 export const generateRecommendations = (state) =>

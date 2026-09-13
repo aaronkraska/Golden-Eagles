@@ -1,3 +1,14 @@
+<!--
+Implementation notes for files whose JSON format does not allow inline comments:
+- package.json defines the client/server npm workspaces and root development, build,
+  start, and test commands. The Node minimum supports the built-in SQLite module.
+- client/package.json owns React, chart/icon dependencies, and Vite development/build tools.
+- server/package.json owns the Express API, Gemini SDK, environment loading, and validation.
+- package-lock.json records the resolved workspace dependency tree, package integrity hashes,
+  and platform/engine constraints. npm manages this file; it is not application logic.
+- vercel.json builds client/dist and forwards /api paths to the Railway backend.
+  This deployed routing does not use the legacy api/index.js handler.
+-->
 # AskBusi: AI Opportunity Finder
 
 AskBusi is an AI-powered business discovery tool. It interviews users about their workflows, pain points, repetitive tasks, and constraints, then generates ranked AI and automation opportunities.

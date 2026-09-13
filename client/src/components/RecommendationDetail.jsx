@@ -9,6 +9,7 @@ export default function RecommendationDetail({
   onReanalyze,
   busy,
 }) {
+  // Field order defines the detail layout; arrays render as lists and scalars as paragraphs.
   const fields = [
     "problem",
     "solution",
@@ -24,6 +25,7 @@ export default function RecommendationDetail({
     "successMetrics",
     "implementationSteps",
   ];
+  // Override technical schema names where a more specific reader-facing label helps.
   const names = {
     solution: "Proposed solution",
     whyAI: "Why AI?",
@@ -32,6 +34,8 @@ export default function RecommendationDetail({
     pilotRecommendation: "Suggested pilot",
     implementationSteps: "Implementation roadmap",
   };
+  // Display server-computed scores and change history without recalculating them in the browser.
+  // The shared chat filters history by this item's stable ID; reanalysis uses the parent callback.
   return (
     <>
       <button className="text-button" onClick={onBack}>

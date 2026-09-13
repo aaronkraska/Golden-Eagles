@@ -24,6 +24,7 @@ const fixture = () =>
             : "Test analysis",
     ]),
   );
+// Exercise schema conversion using the installed SDK integration rather than hand-written JSON.
 test("all response schemas convert with the installed Gemini SDK", () => {
   for (const schema of [InterviewResponse, RecommendationResponse, DiscussionResponse]) {
     const format = responseSchema(schema);
@@ -32,6 +33,7 @@ test("all response schemas convert with the installed Gemini SDK", () => {
     assert.ok(format.properties);
   }
 });
+// Closing and reopening a temporary file verifies persistence beyond a single connection.
 test("SQLite restores saved analysis after reopening the database", () => {
   const directory = mkdtempSync(join(tmpdir(), "opportunity-test-"));
   const filename = join(directory, "analysis.sqlite");
@@ -48,6 +50,7 @@ test("SQLite restores saved analysis after reopening the database", () => {
     rmSync(directory, { recursive: true, force: true });
   }
 });
+// Check normalization endpoints, input rejection, and ordering with contrasting impact ratings.
 test("scoring normalizes extrema, ranks and rejects invalid ratings", () => {
   const low = {
     businessImpact: 0,
@@ -90,6 +93,7 @@ test("real service reports missing key without a mock fallback", async () => {
     if (previous) process.env.GEMINI_API_KEY = previous;
   }
 });
+// Replace fetch at the transport boundary to inspect real SDK serialization without live calls.
 test("Gemini SDK sends structured context and rejects malformed responses", async () => {
   const previousKey = process.env.GEMINI_API_KEY;
   const previousFetch = globalThis.fetch;
@@ -114,6 +118,7 @@ test("Gemini SDK sends structured context and rejects malformed responses", asyn
     else process.env.GEMINI_API_KEY = previousKey;
   }
 });
+// An in-memory store and injected AI exercise HTTP routes, including failure and concurrency paths.
 test("API persists interview, ranks recommendations, handles discussion, duplicate requests, errors and locking", async () => {
   const store = createStore(":memory:");
   let calls = 0;
@@ -234,6 +239,7 @@ test("API persists interview, ranks recommendations, handles discussion, duplica
       ).status,
       404,
     );
+    // Hold one AI call open to prove a second mutation receives a conflict until the first finishes.
     slow = true;
     const pending = call("/interview", { ...input, requestId: randomUUID() });
     while (!release) await new Promise((r) => setTimeout(r, 5));

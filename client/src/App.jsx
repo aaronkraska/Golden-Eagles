@@ -14,10 +14,13 @@ import {
 import { api } from "./services/api.js";
 import ChatPanel from "./components/ChatPanel.jsx";
 import BusinessProfile from "./components/BusinessProfile.jsx";
+// Load the chart library only when the opportunity map is rendered.
 const ImpactEffortChart = lazy(
   () => import("./components/ImpactEffortChart.jsx"),
 );
 import RecommendationDetail from "./components/RecommendationDetail.jsx";
+// Browser storage holds only the session ID; the server restores the full analysis.
+// Storage access may fail in restricted browser contexts, so restoration is optional.
 const savedId = () => {
   try {
     return localStorage.getItem("opportunity-session");
@@ -25,6 +28,7 @@ const savedId = () => {
     return null;
   }
 };
+// This component owns navigation, the current server snapshot, and shared request feedback.
 export default function App() {
   const [session, setSession] = useState(null),
     [page, setPage] = useState("home"),
@@ -32,6 +36,7 @@ export default function App() {
     [busy, setBusy] = useState(""),
     [error, setError] = useState(""),
     [configured, setConfigured] = useState(true);
+  // On mount, check configuration and independently restore the last saved session.
   useEffect(() => {
     api("/health")
       .then((h) => setConfigured(h.configured))
@@ -48,12 +53,14 @@ export default function App() {
         .finally(() => setBusy(""));
     }
   }, []);
+  // Replace local state with the server response and remember its ID for future reloads.
   function remember(s) {
     setSession(s);
     try {
       localStorage.setItem("opportunity-session", s.id);
     } catch {}
   }
+  // Creating a session resets the selected detail and opens the interview stage.
   async function start() {
     setBusy("Starting your analysis…");
     setError("");
@@ -68,6 +75,8 @@ export default function App() {
       setBusy("");
     }
   }
+  // Centralize mutations and return success so composers can retain drafts after failures.
+  // Each invocation gets a new request UUID for the backend's completed-request tracking.
   async function action(path, message, loading = "Analyzing your workflow…") {
     if (busy) return false;
     setBusy(loading);
@@ -87,6 +96,7 @@ export default function App() {
       setBusy("");
     }
   }
+  // Navigate to the refreshed map only after generation succeeds.
   async function generate() {
     if (
       await action(
@@ -99,6 +109,7 @@ export default function App() {
       setPage("results");
     }
   }
+  // Download the current snapshot through a temporary Blob URL, then release that URL.
   function exportAnalysis() {
     const url = URL.createObjectURL(
       new Blob([JSON.stringify(session, null, 2)], {
@@ -111,6 +122,8 @@ export default function App() {
     a.click();
     URL.revokeObjectURL(url);
   }
+  // Derive the detail from the latest snapshot so reanalysis immediately updates the view.
+  // Rendering below switches among home, interview, selected detail, and ranked map.
   const item = session?.useCases.find((x) => x.id === selected);
   return (
     <div className="app">

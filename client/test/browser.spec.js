@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { UseCase, emptyProfile } from "../../server/utils/validation.js";
 import { randomUUID } from "node:crypto";
+// Use real session endpoints for restoration, but intercept AI submission to test recoverable errors.
 test("desktop and mobile landing, actual session creation, refresh and safe error recovery", async ({
   page,
 }) => {
@@ -68,6 +69,7 @@ test("desktop and mobile landing, actual session creation, refresh and safe erro
   });
   expect(errors).toEqual([]);
 });
+// Seed browser storage and intercept API responses to render the full dashboard without live AI.
 test("isolated dashboard fixture renders matrix, detail, discussion and score revision", async ({
   page,
 }) => {
@@ -137,6 +139,7 @@ test("isolated dashboard fixture renders matrix, detail, discussion and score re
   await expect(
     page.getByRole("heading", { name: "Solution workflow" }),
   ).toBeVisible();
+  // Return a revised snapshot to verify that discussion, ratings, and the audit trail refresh together.
   await page.route(`**/api/recommendations/${caseId}/chat`, (route) => {
     session.history = [
       { role: "user", scope: caseId, content: "We have no API." },

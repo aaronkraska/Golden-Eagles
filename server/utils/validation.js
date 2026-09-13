@@ -1,7 +1,9 @@
 import { z } from "zod";
+// Shared field types keep stored business facts and structured model responses consistent.
 const text = z.string();
 const list = z.array(text);
 const rating = z.number().min(0).max(10);
+// Unknown scalar facts are null; multi-value facts use arrays, including empty arrays.
 export const Profile = z.object({
   organization: text.nullable(),
   industry: text.nullable(),
@@ -20,6 +22,7 @@ export const Profile = z.object({
   constraints: list,
   currentAutomation: list,
 });
+// Derive initial values from the schema so new profile fields are initialized automatically.
 export const emptyProfile = () =>
   Object.fromEntries(
     Object.entries(Profile.shape).map(([key, value]) => [
@@ -27,6 +30,7 @@ export const emptyProfile = () =>
       value instanceof z.ZodArray ? [] : null,
     ]),
   );
+// Each interview reply includes the whole evolving profile and the model's readiness decision.
 export const InterviewResponse = z.object({
   message: text,
   profile: Profile,
@@ -34,6 +38,7 @@ export const InterviewResponse = z.object({
   understandingScore: z.number().min(0).max(100),
   interviewComplete: z.boolean(),
 });
+// AI supplies evidence and bounded ratings; IDs, scores, and change logs are added by the app.
 export const UseCase = z.object({
   title: text,
   aiRecommended: z.boolean(),
@@ -65,6 +70,7 @@ export const RecommendationResponse = z.object({
   summary: text,
   useCases: z.array(UseCase).min(1).max(5),
 });
+// A discussion always returns a profile but may leave the selected recommendation unchanged.
 export const DiscussionResponse = z.object({
   message: text,
   profile: Profile,
@@ -72,6 +78,7 @@ export const DiscussionResponse = z.object({
   changeReason: text.nullable(),
   otherRecommendationsAffected: z.boolean(),
 });
+// Strict input rejects unknown keys; routes decide whether the optional message is required.
 export const RequestBody = z
   .object({
     sessionId: z.string().uuid(),

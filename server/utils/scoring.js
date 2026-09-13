@@ -8,6 +8,7 @@ export const WEIGHTS = {
   implementationComplexity: -0.08,
   risk: -0.07,
 };
+// Validate again at the scoring boundary so direct callers cannot bypass the rating bounds.
 export function scoreOpportunity(item) {
   const weighted = Object.entries(WEIGHTS).reduce((sum, [key, weight]) => {
     if (!Number.isFinite(item[key]) || item[key] < 0 || item[key] > 10)
@@ -16,6 +17,7 @@ export function scoreOpportunity(item) {
   }, 0);
   return Math.round((weighted + 1.5) * 10);
 }
+// Copy items with fresh scores, then sort descending with alphabetical titles breaking ties.
 export const rank = (items) =>
   items
     .map((item) => ({ ...item, opportunityScore: scoreOpportunity(item) }))

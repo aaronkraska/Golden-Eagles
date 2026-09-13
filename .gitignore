@@ -9,6 +9,7 @@ dist/
 .npm-cache/
 
 # Project data and reports
+# SQLite session data and generated test artifacts stay local to each checkout.
 server/data/
 test-results/
 playwright-report/
