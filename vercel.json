@@ -6,11 +6,5 @@
       "source": "/api/:path*",
       "destination": "https://golden-eagles-production.up.railway.app/api/:path*"
     }
-  ],
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs22.x",
-      "maxDuration": 60
-    }
-  }
+  ]
 }
