@@ -1,204 +1,362 @@
-# AskBusi - AI Opportunity Finder
+# AskBusi: AI Opportunity Finder
 
-A functional, general-purpose AI discovery application. Users describe any business workflow; a live AI consultant extracts context, chooses its next question, and decides when the evidence supports recommendations. There are no seeded businesses, canned model answers, or industry-based recommendation branches.
+AskBusi is an AI-powered business discovery tool. It interviews users about their workflows, pain points, repetitive tasks, and constraints, then generates ranked AI and automation opportunities.
 
-## Prerequisites and installation
+The application does not rely on hard-coded industries, canned recommendations, or prewritten interview paths. Google Gemini dynamically decides what to ask next and when enough information has been collected to generate recommendations.
 
-- Node.js 22.13+ (Node 24 recommended) and npm. SQLite uses Node's built-in `node:sqlite`; some Node versions print an experimental warning.
-- OpenAI developer account, API billing/quota, and access to the configured model. A ChatGPT subscription does not supply this application's API key.
+## Current Deployment
 
-In PowerShell:
+```text
+Browser
+  |
+  v
+Vercel: React + Vite frontend
+  |
+  | /api/* rewrite
+  v
+Railway: Node.js + Express backend
+  |
+  +--> SQLite session storage
+  |
+  v
+Google Gemini API
+```
+
+- Frontend: Vercel
+- Backend: Railway
+- AI model: Google Gemini 3.8 Flash
+- Backend: Express 5
+- Frontend: React 19 + Vite 7
+- Storage: SQLite
+- Validation: Zod
+- Charts: Recharts
+
+The browser only calls relative `/api/...` routes. Vercel rewrites those requests to Railway, so the Gemini API key is never exposed to the frontend.
+
+## Features
+
+- Adaptive AI-led business interview
+- Dynamic follow-up questions based on prior answers
+- AI readiness and understanding tracking
+- Ranked AI and automation recommendations
+- Impact-versus-effort visualization
+- Recommendation details, assumptions, risks, and implementation steps
+- Follow-up discussion for individual recommendations
+- Recommendation reanalysis when new constraints are provided
+- SQLite-backed session storage
+- JSON export of analysis data
+- Request validation and structured AI responses
+- API rate limiting and security headers
+
+## Prerequisites
+
+- Node.js 22.13 or newer
+- npm
+- A Google Gemini API key with access to `gemini-3.8-flash`
+
+## Local Setup
+
+From the repository root:
 
 ```powershell
-cd "C:\Users\krask071\Hackathon 2\SMSU-Hackathon"
 npm install
-Copy-Item server/.env.example server/.env
-notepad server/.env
 ```
 
-Create an API key in the [OpenAI developer platform](https://platform.openai.com/api-keys). Paste it only into `server/.env`, replacing the placeholder:
+Create `server/.env`:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_MODEL=gpt-5.6-luna
-OPENAI_ANALYSIS_MODEL=gpt-5.6-luna
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-3.8-flash
+GEMINI_ANALYSIS_MODEL=gemini-3.8-flash
 PORT=3001
+HOST=0.0.0.0
 ```
 
-`OPENAI_MODEL` controls the interactive interview and discussion; optional `OPENAI_ANALYSIS_MODEL` controls generation and explicit reanalysis and falls back to `OPENAI_MODEL`. GPT-5.6 Luna is the default cost-oriented option, verified against the [official model documentation](https://developers.openai.com/api/docs/models/gpt-5.6-luna). Model availability depends on your account. Restart the backend after changing configuration. Do not use `VITE_OPENAI_API_KEY` or put keys in client code. `.env` and SQLite files are ignored by Git.
+`GEMINI_API_KEY` is required. The model variables are optional because the backend defaults to `gemini-3.8-flash`.
 
-## Run locally
+Never prefix the key with `VITE_`. Vite-prefixed variables can be included in the client bundle and must not be used for secrets. Do not commit `.env`.
 
-Both services from the repository root:
+## Run Locally
+
+Start both workspaces from the repository root:
 
 ```powershell
 npm run dev
 ```
 
-Open **http://127.0.0.1:5173**. Vite proxies `/api` to port 3001.
+Open `http://127.0.0.1:5173`. Vite proxies `/api` requests to the backend on port `3001`.
 
-Or use two terminals, both in the repository root:
+To run the services separately:
 
 ```powershell
-# Terminal 1: backend
+# Backend
 npm run dev -w server
-```
 
-```powershell
-# Terminal 2: frontend
+# Frontend, in a second terminal
 npm run dev -w client
 ```
 
-Production-style local build and server:
+## Production-Style Local Run
 
 ```powershell
 npm run build
 npm start
 ```
 
-Open **http://127.0.0.1:3001**; Express serves the compiled frontend. If changing the API port during development, also update the target in `client/vite.config.js`.
+The Express backend listens on `PORT`, or `3001` by default. The frontend is built into `client/dist`.
 
-## Deploy to Vercel
+## Environment Variables
 
-This repository includes a Vercel function entrypoint at `api/index.js`. In Vercel, create a project from this repository with the project root set to `SMSU-Hackathon`. The included `vercel.json` sets the build command and routes `/api/*` requests to the Express function.
+| Variable                | Required | Purpose                                           |
+| ----------------------- | -------- | ------------------------------------------------- |
+| `GEMINI_API_KEY`        | Yes      | Google Gemini API key                             |
+| `GEMINI_MODEL`          | No       | Interview and discussion model                    |
+| `GEMINI_ANALYSIS_MODEL` | No       | Recommendation and reanalysis model               |
+| `PORT`                  | No       | Backend port; Railway supplies this in production |
+| `HOST`                  | No       | Bind address; defaults to `0.0.0.0`               |
 
-Add these environment variables in the Vercel project settings for Production, Preview, and Development as needed:
+## Deploy the Backend to Railway
 
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=your_model
-GEMINI_ANALYSIS_MODEL=your_analysis_model
-```
+1. Create a Railway service from `https://github.com/aaronkraska/Golden-Eagles`.
+2. Use the repository root as the service root.
+3. Set the custom start command to:
 
-`GEMINI_API_KEY` is server-only. Do not prefix it with `VITE_`, put it in client code, or commit it. Vercel exposes environment variables to the function, not to the browser, unless the variable is explicitly bundled into the client build.
+   ```text
+   npm start
+   ```
 
-The Vercel function currently uses `/tmp/analyses.sqlite`, which is writable but ephemeral. Sessions can disappear when Vercel starts a new function instance, and concurrent instances do not share the same database. Use a hosted database and replace `createStore` with a network-backed store before using this for persistent user data. The local SQLite store remains suitable for local development and tests.
+4. Add these variables under **Service > Variables**:
 
-## Architecture and request flow
+   ```env
+   GEMINI_API_KEY=your_actual_key
+   GEMINI_MODEL=gemini-3.8-flash
+   GEMINI_ANALYSIS_MODEL=gemini-3.8-flash
+   ```
+
+   Railway provides `PORT`; do not hard-code the production port.
+
+5. Generate a public domain under **Settings > Networking**.
+6. Verify the backend:
+
+   ```text
+   https://YOUR-RAILWAY-DOMAIN/api/health
+   ```
+
+   A configured backend returns:
+
+   ```json
+   { "ok": true, "configured": true }
+   ```
+
+If `configured` is `false`, Railway does not have a valid `GEMINI_API_KEY`. Redeploy after changing environment variables.
+
+### SQLite on Railway
+
+Session data is stored in `server/data/analyses.sqlite`. Railway's normal filesystem is ephemeral, so a redeploy can remove the database.
+
+For hackathon testing this may be acceptable. To preserve local SQLite data, attach a Railway Volume mounted at:
 
 ```text
-Browser / React + Vite
-    → HTTP JSON / Express
-    → server-owned SQLite session
-    → OpenAI official JavaScript SDK / Responses API
-    → strict structured output + Zod validation
-    → deterministic scoring + SQLite commit
-    → React profile, conversation and dashboard
+/app/server/data
 ```
 
-**Interview:** Start Analysis creates a random session ID and saves it in browser localStorage. A free-form message goes from `ChatPanel.jsx` through `services/api.js` to `POST /api/interview`. Express validates the message and IDs, loads the server-owned history and profile, and calls `runBusinessInterview`. The model receives the accumulated context and the new message. `responses.parse` uses `zodTextFormat` as documented in [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs). Validated output updates the profile, important unknowns, evidence-based readiness and completion status. Only then is the turn committed. No fixed question list or message counter determines readiness. The initial greeting is static UI copy; every substantive response comes from OpenAI.
+A hosted database such as PostgreSQL is a better long-term option for multiple backend instances.
 
-**Generation:** When the model marks the interview complete, the user can generate a map or continue the interview. `POST /api/recommendations` loads authoritative server context and makes a separate model request. The model returns up to five complete opportunities, including conventional automation when appropriate. Zod validates all fields and 0–10 ratings. JavaScript assigns IDs, computes scores, sorts opportunities, and saves the map. The client displays cards, a responsive impact/effort matrix, complete details, workflow steps, assumptions and pilot plans. The browser never supplies trusted profile or recommendation objects.
+## Deploy the Frontend to Vercel
 
-**Discussion and reanalysis:** The selected recommendation, all other recommendations, original interview, updated profile and discussions are sent with each follow-up. The model may return a complete replacement recommendation and change reason. The server recalculates its score, preserves its ID, records previous/new score, complexity and risk, and reranks the map. Changes affecting other opportunities flag the map as stale. Refreshing the map regenerates all recommendations with current context and new IDs; earlier discussion remains in server history. Explicit reanalysis uses the analysis model.
+Vercel hosts the React/Vite frontend. The project root is the repository root; do not set it to `SMSU-Hackathon`, `client`, or `server`.
 
-## State, privacy and request safety
+Use these project settings:
 
-- SQLite at `server/data/analyses.sqlite` stores full profile, history, recommendations, changes and processed request IDs. Browser localStorage stores only the session ID. Refreshes and backend restarts retain analyses.
-- Sessions have unguessable UUIDs. Their IDs are bearer access tokens, not user authentication. Do not share them. There is no session listing endpoint.
-- Responses use `store:false`; this application explicitly sends its stored state on each call instead of relying on previous-response IDs. This does not replace OpenAI's applicable API data policies.
-- API keys stay on the server. React renders text, not raw AI HTML. Request bodies have a 32 KB limit; messages are capped at 12,000 characters. Helmet and a basic per-IP rate limit are enabled.
-- One mutation per session runs at a time. Reusing a completed request ID returns saved state without another model call. Failed turns are not committed. The UI retains unsent text after failures.
-- No sensitive conversation text or keys are logged. SQLite content is unencrypted; protect local disk access. The visible reminder asks users not to submit secrets. Submitted business context is sent to OpenAI.
-- Export downloads the current analysis as JSON, including conversation history. New Analysis creates another session without deleting the previous one.
+| Setting          | Value           |
+| ---------------- | --------------- |
+| Root Directory   | Blank or `.`    |
+| Install Command  | `npm install`   |
+| Build Command    | `npm run build` |
+| Output Directory | `client/dist`   |
 
-## Opportunity score
+The repository's `vercel.json` rewrites API calls to Railway:
 
-Implemented in `server/utils/scoring.js`, with editable `WEIGHTS`:
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://YOUR-RAILWAY-DOMAIN/api/:path*"
+    }
+  ]
+}
+```
+
+Replace `YOUR-RAILWAY-DOMAIN` with the actual Railway domain. Do not add a Vercel Function runtime block. Railway hosts the backend, so Vercel does not need to run `api/index.js`.
+
+## Architecture and Request Flow
 
 ```text
-weighted = impact×0.35 + timeSavingPotential×0.20
-         + repetition×0.15 + dataReadiness×0.15
-         − implementationComplexity×0.08 − risk×0.07
+React UI
+  |
+  | fetch("/api/...")
+  v
+Vercel rewrite
+  |
+  v
+Railway Express API
+  |
+  +--> Request validation
+  +--> SQLite session lookup
+  +--> Gemini structured response
+  +--> Deterministic opportunity scoring
+  +--> SQLite save
+  |
+  v
+JSON response to React
+```
+
+### Interview Flow
+
+1. The user starts a new analysis.
+2. The backend creates a UUID session.
+3. The user describes a workflow or business problem.
+4. `POST /api/interview` sends the stored context and new message to Gemini.
+5. Gemini returns structured JSON containing the response, business context, missing information, understanding score, and completion state.
+6. Zod validates the response before the server saves the turn.
+
+The interview is adaptive. It does not use a fixed list of questions or a fixed turn count.
+
+### Recommendation Flow
+
+1. `POST /api/recommendations` loads the stored session.
+2. Gemini generates AI and conventional automation opportunities.
+3. Zod validates the structured response.
+4. JavaScript calculates deterministic opportunity scores.
+5. Recommendations are ranked and saved.
+6. The frontend displays recommendation cards and the impact/effort chart.
+
+### Discussion and Reanalysis
+
+Users can open a recommendation and provide new information. The backend can discuss the recommendation, update it, recalculate its score, record what changed, and flag the complete opportunity map as stale when other recommendations may also be affected.
+
+## Opportunity Scoring
+
+Scoring is implemented in `server/utils/scoring.js`:
+
+```text
+weighted = impact × 0.35
+         + timeSavingPotential × 0.20
+         + repetition × 0.15
+         + dataReadiness × 0.15
+         - implementationComplexity × 0.08
+         - risk × 0.07
+
 score = round((weighted + 1.5) × 10)
 ```
 
-The weighted range is −1.5 to 8.5, normalized to 0–100. Higher is better. Ties sort by title. Ratings are model judgments; the final ranking is deterministic. Numeric savings require a stated basis, and unknown savings display “Insufficient information to estimate.” Predictions and hypothetical reductions need pilot validation.
+The final score is normalized to `0-100`. Gemini supplies the ratings; the application calculates the final score and ranking.
 
-## Project structure
+## Project Structure
 
 ```text
-SMSU-Hackathon/
-├── package.json                 # workspace scripts
-├── package-lock.json
-├── .gitignore
-├── README.md
+Golden-Eagles/
+├── api/                     # Legacy Vercel entrypoint; Railway is current backend
 ├── client/
 │   ├── package.json
-│   ├── index.html
 │   ├── vite.config.js
 │   └── src/
 │       ├── main.jsx
-│       ├── App.jsx              # landing, interview, results and navigation
+│       ├── App.jsx
 │       ├── styles.css
 │       ├── services/api.js
 │       └── components/
-│           ├── BusinessProfile.jsx
-│           ├── ChatPanel.jsx
-│           ├── ImpactEffortChart.jsx
-│           └── RecommendationDetail.jsx
-└── server/
-    ├── package.json
-    ├── .env.example
-    ├── server.js                # environment and local listener
-    ├── app.js                   # validated API routes
-    ├── store.js                 # SQLite persistence
-    ├── services/openaiService.js
-    ├── prompts/
-    │   ├── interviewer.js
-    │   └── recommendationAnalyst.js
-    ├── utils/
-    │   ├── validation.js        # strict structured response schemas
-    │   └── scoring.js
-    └── test/app.test.js
+├── server/
+│   ├── package.json
+│   ├── server.js
+│   ├── app.js
+│   ├── store.js
+│   ├── services/geminiService.js
+│   ├── prompts/
+│   ├── utils/
+│   └── test/
+├── package.json
+├── package-lock.json
+├── playwright.config.js
+├── vercel.json
+└── README.md
 ```
 
-## API routes
+## API Routes
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| GET | `/api/health` | Backend availability and key configuration status |
-| POST | `/api/session` | Create saved analysis; body `{}` |
-| GET | `/api/session/:id` | Restore analysis |
-| POST | `/api/interview` | Submit message |
-| POST | `/api/recommendations` | Generate or refresh map |
-| POST | `/api/recommendations/:id/chat` | Discuss selected recommendation |
-| POST | `/api/recommendations/:id/reanalyze` | Explicitly reassess selected recommendation |
+| Method | Route                                | Purpose                                       |
+| ------ | ------------------------------------ | --------------------------------------------- |
+| GET    | `/api/health`                        | Check backend status and Gemini configuration |
+| POST   | `/api/session`                       | Create a new analysis session                 |
+| GET    | `/api/session/:id`                   | Restore an existing session                   |
+| POST   | `/api/interview`                     | Submit an interview message                   |
+| POST   | `/api/recommendations`               | Generate or refresh recommendations           |
+| POST   | `/api/recommendations/:id/chat`      | Discuss a recommendation                      |
+| POST   | `/api/recommendations/:id/reanalyze` | Reanalyze a recommendation                    |
 
-Mutation bodies contain `sessionId` and unique UUID `requestId`. Interview/chat/reanalysis also require `message`. Error responses use `{ "error": "Helpful message" }`. Per-session concurrent requests return 409; completed duplicate request IDs are idempotent.
+Mutation requests use a session ID and request UUID so completed duplicate requests can be handled safely.
 
-## Verification
+## Security and Request Safety
+
+- Helmet security headers
+- JSON request size limits
+- Per-IP API rate limiting
+- UUID-based analysis sessions
+- Zod validation
+- Server-side Gemini API key access
+- Structured model responses
+- One active mutation per session
+- Idempotent completed request handling
+
+Session IDs act as bearer access tokens rather than full user authentication. Do not treat this hackathon build as an authenticated multi-user SaaS product.
+
+## Testing
 
 ```powershell
 npm test
 npm run build
+npm run test:browser
 ```
 
-Tests use isolated injected AI fixtures only in the test file: scoring boundaries, ranking, malformed ratings, missing-key behavior, session persistence through requests, error rollback, idempotency, concurrent request rejection, recommendation replacement and conventional automation support. Runtime has no mock mode.
-
-For live acceptance testing after configuring your key: describe a business not listed in the brief; include department and volume in the first message; verify those are extracted and not asked again; complete the adaptive interview; generate a map; open a recommendation; add a constraint; inspect change history and refresh the map if flagged; reload to verify persistence. Also test a deterministic workflow where AI is unnecessary. Model behavior must be checked with live calls; automated fixtures do not establish the quality of model reasoning.
+The automated backend tests use injected AI fixtures and do not spend live API credits. Live acceptance testing should verify the configured Railway service, adaptive interview, recommendation generation, persistence, and Vercel API rewrites.
 
 ## Troubleshooting
 
-| Symptom | Action |
-| --- | --- |
-| OpenAI not configured | Create `server/.env`, replace the placeholder, restart backend. |
-| Authentication / 401 | Check the backend key is valid and belongs to the intended project. |
-| Rate limit / 429 | Check API credits, project limits and billing; wait before retrying. |
-| Invalid model / rejected request | Check account access, model ID, and structured-output support. |
-| Network error | Check backend internet connectivity to OpenAI. |
-| Timeout | Model requests stop at 90 seconds. Reload saved analysis before retrying a browser timeout. |
-| Invalid structured response / refusal | Retry or rephrase. Existing saved state is preserved. |
-| Server unavailable | Start both services; verify `/api/health` and proxy port. |
-| Session not found | Database may have been removed; start a new analysis. |
-| Request already running / 409 | Wait for the existing turn to finish. |
-| Node SQLite import error | Upgrade to Node 22.13+ or Node 24. |
-| Port already in use | Stop the other process or configure another port and Vite proxy. |
-| npm offline cache error | Use an internet-enabled terminal and `npm install --offline=false`. |
+| Problem                             | Check                                              |
+| ----------------------------------- | -------------------------------------------------- |
+| Vercel cannot find `package.json`   | Keep Root Directory blank or `.`                   |
+| Vercel cannot find output directory | Set Output Directory to `client/dist`              |
+| Vercel runtime error                | Remove any `functions.*.runtime` block             |
+| `/api/health` does not load         | Confirm Railway is running and has a public domain |
+| `configured: false`                 | Add `GEMINI_API_KEY` to Railway and redeploy       |
+| Gemini authentication error         | Verify the key and Google AI project access        |
+| Gemini model error                  | Verify `GEMINI_MODEL=gemini-3.8-flash`             |
+| Gemini `429`                        | Check API quota and rate limits                    |
+| Frontend works but API calls fail   | Check the Vercel rewrite destination               |
+| Sessions disappear after redeploy   | Attach a Railway Volume or use PostgreSQL          |
+| Node SQLite import fails            | Upgrade to Node 22.13 or newer                     |
 
-## Hackathon limitations
+## Current Limitations
 
-Designed for local use; Express binds to loopback. No account authentication, enterprise integrations, encrypted database, automatic retention cleanup, distributed concurrency lock or streaming responses. Do not expose the API publicly without authentication, authorization and stronger deployment controls. Full history is sent each turn, so cost/context grows; sessions cap at 160 history entries. API generation can take tens of seconds. Google Fonts is optional; system sans-serif works offline. Charts and workflow descriptions are advisory, not integrations or executable systems. AI estimates and judgments are not guaranteed facts. Live end-to-end model verification requires your own configured API key and billing; no key is bundled.
+- No user accounts or authentication
+- SQLite instead of a networked production database
+- Session IDs act as bearer tokens
+- Railway storage is ephemeral without a volume
+- No distributed session locking across multiple instances
+- AI-generated estimates require business validation
+- Long conversations increase token usage
+- Model generation can take several seconds
+- Recommendations are advisory and are not automatically deployed
 
+## AI Model
 
+The backend uses Google's official `@google/genai` JavaScript SDK. The default model is `gemini-3.8-flash`, configured in `server/services/geminiService.js`.
 
+The API key is read only from `process.env.GEMINI_API_KEY` and is never intentionally sent to the browser.
+
+## License / Hackathon Use
+
+This project was created as a hackathon prototype for discovering practical AI opportunities in real business workflows.
