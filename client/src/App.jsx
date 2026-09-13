@@ -36,7 +36,7 @@ export default function App() {
     [busy, setBusy] = useState(""),
     [error, setError] = useState(""),
     [configured, setConfigured] = useState(true);
-  // On mount, check configuration and independently restore the last saved session.
+  // Restore the saved session for My analysis while keeping refresh on the home page.
   useEffect(() => {
     api("/health")
       .then((h) => setConfigured(h.configured))
@@ -47,7 +47,6 @@ export default function App() {
       api(`/session/${id}`)
         .then((s) => {
           setSession(s);
-          setPage(s.useCases.length ? "results" : "interview");
         })
         .catch((e) => setError(e.message))
         .finally(() => setBusy(""));

@@ -25,6 +25,11 @@ test("desktop and mobile landing, actual session creation, refresh and safe erro
   );
   expect(id).toBeTruthy();
   await page.reload();
+  await expect(page.getByRole("button", { name: /My analysis/ })).toBeEnabled();
+  await expect(
+    page.getByRole("heading", { name: /Less AI hype/ }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /My analysis/ }).click();
   await expect(
     page.getByRole("heading", { name: "Business understanding" }),
   ).toBeVisible();
@@ -117,6 +122,7 @@ test("isolated dashboard fixture renders matrix, detail, discussion and score re
     route.fulfill({ json: { ok: true, configured: true } }),
   );
   await page.goto("/");
+  await page.getByRole("button", { name: /My analysis/ }).click();
   await expect(
     page.getByRole("heading", { name: "Possibilities, prioritized." }),
   ).toBeVisible();
